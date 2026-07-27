@@ -159,6 +159,12 @@ function updateBall() {
   ball.x += ball.vx;
   ball.y += ball.vy;
 
+  // Bola perdida por abajo.
+  if (ball.y - ball.r > HEIGHT) {
+    loseLife();
+    return;
+  }
+
   // Rebote en paredes izquierda / derecha.
   if (ball.x - ball.r < 0) {
     ball.x = ball.r;
@@ -188,6 +194,18 @@ function updateBall() {
     ball.x - ball.r <= paddle.x + paddle.w
   ) {
     bounceOffPaddle();
+  }
+}
+
+// Pierde una vida: vuelve al saque pegado o pasa a Game Over si no quedan vidas.
+function loseLife() {
+  game.lives--;
+  game.ballLaunched = false;
+  ball.vx = 0;
+  ball.vy = 0;
+  if (game.lives <= 0) {
+    game.lives = 0;
+    game.phase = "gameover";
   }
 }
 
