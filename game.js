@@ -298,6 +298,18 @@ function drawBall() {
   drawSprite(ctx, "ball", ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
 }
 
+function drawHUD() {
+  ctx.fillStyle = "#fff";
+  ctx.font = "20px Arial, sans-serif";
+  ctx.textBaseline = "top";
+
+  ctx.textAlign = "left";
+  ctx.fillText("Puntos: " + game.score, 12, 12);
+
+  ctx.textAlign = "right";
+  ctx.fillText("Vidas: " + game.lives, WIDTH - 12, 12);
+}
+
 // Bucle principal: limpia el canvas y dibuja la escena cada frame.
 function loop(timestamp) {
   now = timestamp;
@@ -311,6 +323,7 @@ function loop(timestamp) {
   drawExplosions();
   drawPaddle();
   drawBall();
+  drawHUD();
 
   requestAnimationFrame(loop);
 }
