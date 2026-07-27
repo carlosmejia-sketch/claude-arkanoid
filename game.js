@@ -2,6 +2,7 @@
 
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+const levelSelect = document.getElementById("level");
 
 const WIDTH = canvas.width;   // 800
 const HEIGHT = canvas.height; // 600
@@ -175,9 +176,18 @@ canvas.addEventListener("mousedown", () => {
   handleAction();
 });
 
+// Lee el nivel elegido en el <select> y fija nivel, velocidad y bloques.
+function applySelectedLevel() {
+  const value = parseInt(levelSelect.value, 10);
+  game.level = value;
+  SPEED = LEVELS[value - 1].speed;
+  bricks = buildBricks(LEVELS[value - 1].layout);
+}
+
 // Interpreta la acción (click/espacio) según la fase del juego.
 function handleAction() {
   if (game.phase === "start") {
+    applySelectedLevel();
     game.phase = "playing";
   } else if (game.phase === "playing") {
     launchBall();
@@ -199,11 +209,11 @@ function resetGame() {
   game.score = 0;
   game.lives = 3;
   game.ballLaunched = false;
+  applySelectedLevel();
   game.phase = "playing";
   ball.vx = 0;
   ball.vy = 0;
   paddle.x = 350;
-  bricks = buildBricks();
   explosions.length = 0;
 }
 
@@ -433,6 +443,10 @@ function drawWinScreen() {
 function loop(timestamp) {
   now = timestamp;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+  // El selector solo es usable fuera de la partida (start/gameover/win).
+  // Deshabilitarlo mientras se juega también le quita el foco del teclado.
+  levelSelect.disabled = game.phase === "playing";
 
   if (game.phase === "playing") {
     updatePaddle();
