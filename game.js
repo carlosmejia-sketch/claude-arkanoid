@@ -8,6 +8,16 @@ const HEIGHT = canvas.height; // 600
 
 // --- Entidades ---
 
+const SPEED = 5; // módulo constante de la velocidad de la bola (px/frame)
+
+// Estado global del juego
+const game = {
+  phase: "start",       // "start" | "playing" | "gameover" | "win"
+  score: 0,
+  lives: 3,
+  ballLaunched: false,  // false = pegada a la paleta esperando saque
+};
+
 // Paleta (esquina superior izquierda)
 const paddle = {
   x: 350, y: 560,
@@ -78,6 +88,27 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowRight") keys.right = false;
 });
 
+// Saque con barra espaciadora.
+document.addEventListener("keydown", (e) => {
+  if (e.key === " " || e.code === "Space") {
+    e.preventDefault();
+    launchBall();
+  }
+});
+
+// Saque con click.
+canvas.addEventListener("mousedown", () => {
+  launchBall();
+});
+
+// Lanza la bola si está pegada a la paleta (módulo de velocidad = SPEED).
+function launchBall() {
+  if (game.ballLaunched) return;
+  game.ballLaunched = true;
+  ball.vx = 0;
+  ball.vy = -SPEED;
+}
+
 // La paleta sigue el cursor: centrada en el ratón, ajustando por el escalado del canvas.
 canvas.addEventListener("mousemove", (e) => {
   const rect = canvas.getBoundingClientRect();
@@ -97,6 +128,17 @@ function updatePaddle() {
   if (keys.left) paddle.x -= paddle.speed;
   if (keys.right) paddle.x += paddle.speed;
   clampPaddle();
+}
+
+function updateBall() {
+  if (!game.ballLaunched) {
+    // Pegada a la paleta: centrada encima de ella.
+    ball.x = paddle.x + paddle.w / 2;
+    ball.y = paddle.y - ball.r;
+    return;
+  }
+  ball.x += ball.vx;
+  ball.y += ball.vy;
 }
 
 // --- Dibujo ---
@@ -121,6 +163,7 @@ function loop() {
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
   updatePaddle();
+  updateBall();
 
   drawBricks();
   drawPaddle();
