@@ -15,6 +15,36 @@ body {
   background: #101018;
 }
 
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+#level-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font: 16px Arial, sans-serif;
+}
+
+#level-picker select {
+  background: #1c1c28;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: 16px Arial, sans-serif;
+  cursor: pointer;
+}
+
+#level-picker select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 #game {
   display: block;
   background: #000;
