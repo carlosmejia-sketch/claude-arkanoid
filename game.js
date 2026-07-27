@@ -22,6 +22,48 @@ const ball = {
   vx: 0, vy: 0,
 };
 
+// --- Bloques ---
+
+const POINTS_PER_BRICK = 10;
+
+// Layout del nivel: cada fila es un color de sprite.
+const LEVEL = [
+  ["red", "red", "red", "red", "red", "red", "red", "red"],
+  ["yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow"],
+  ["cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"],
+  ["green", "green", "green", "green", "green", "green", "green", "green"],
+];
+
+// Márgenes fijos de la rejilla (px)
+const GRID_TOP = 60;      // separación desde el borde superior
+const GRID_SIDE = 40;     // margen izquierdo/derecho
+const BRICK_GAP = 4;      // hueco entre bloques
+const BRICK_H = 24;       // alto de cada bloque
+
+// Ancho de bloque derivado del nº de columnas y los márgenes.
+const COLS = LEVEL[0].length;
+const BRICK_W = (WIDTH - GRID_SIDE * 2 - BRICK_GAP * (COLS - 1)) / COLS;
+
+// Genera el array plano de bloques a partir de LEVEL.
+function buildBricks() {
+  const list = [];
+  for (let row = 0; row < LEVEL.length; row++) {
+    for (let col = 0; col < LEVEL[row].length; col++) {
+      list.push({
+        x: GRID_SIDE + col * (BRICK_W + BRICK_GAP),
+        y: GRID_TOP + row * (BRICK_H + BRICK_GAP),
+        w: BRICK_W,
+        h: BRICK_H,
+        color: LEVEL[row][col],
+        alive: true,
+      });
+    }
+  }
+  return list;
+}
+
+let bricks = buildBricks();
+
 // --- Entrada ---
 
 const keys = { left: false, right: false };
@@ -59,6 +101,13 @@ function updatePaddle() {
 
 // --- Dibujo ---
 
+function drawBricks() {
+  for (const b of bricks) {
+    if (!b.alive) continue;
+    drawSprite(ctx, "block_" + b.color, b.x, b.y, b.w, b.h);
+  }
+}
+
 function drawPaddle() {
   drawSprite(ctx, "paddle", paddle.x, paddle.y, paddle.w, paddle.h);
 }
@@ -73,6 +122,7 @@ function loop() {
 
   updatePaddle();
 
+  drawBricks();
   drawPaddle();
   drawBall();
 
