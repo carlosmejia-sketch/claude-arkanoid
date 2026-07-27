@@ -1,6 +1,6 @@
 # SPEC 02 — Niveles con velocidad progresiva y selector
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** [01-mvp-jugable](01-mvp-jugable.md)
 > **Fecha:** 2026-07-27
 > **Objetivo:** Añadir 5 niveles seleccionables desde un `<select>` HTML, donde cada nivel tiene su propio layout de bloques y una velocidad de bola mayor a mayor número de nivel.
@@ -149,19 +149,19 @@ Cada paso deja el juego ejecutable.
 
 ## Criterios de aceptación
 
-- [ ] Sobre el canvas se muestra un `<select>` con 5 opciones (Nivel 1 a Nivel 5) y "Nivel 1" seleccionado por defecto.
-- [ ] Al empezar la partida se carga el layout del nivel elegido en el `<select>`.
-- [ ] La velocidad de la bola es mayor cuanto mayor es el nivel (4, 5, 6, 7, 8 px/frame para niveles 1–5).
-- [ ] El módulo de la velocidad de la bola se mantiene constante durante toda una partida.
-- [ ] Cada nivel muestra su propio layout de bloques y las celdas `null` quedan sin bloque.
-- [ ] Todos los bloques se rompen de un solo golpe en los 5 niveles.
-- [ ] El `<select>` está deshabilitado mientras se está jugando (`phase === "playing"`).
-- [ ] El `<select>` vuelve a estar habilitado en las pantallas de inicio, Game Over y Victoria.
-- [ ] El HUD muestra el nivel en curso (`Nivel N`) y coincide con el nivel elegido.
-- [ ] Al ganar (todos los bloques rotos) el juego vuelve al selector y permite elegir nivel antes de rejugar.
-- [ ] Al perder (0 vidas) el juego vuelve al selector y permite elegir nivel antes de rejugar.
-- [ ] Cambiar de nivel en el `<select>` y volver a empezar carga el nuevo layout y la nueva velocidad.
-- [ ] El juego carga sin errores en consola.
+- [x] Sobre el canvas se muestra un `<select>` con 5 opciones (Nivel 1 a Nivel 5) y "Nivel 1" seleccionado por defecto.
+- [x] Al empezar la partida se carga el layout del nivel elegido en el `<select>`.
+- [x] La velocidad de la bola es mayor cuanto mayor es el nivel (4, 5, 6, 7, 8 px/frame para niveles 1–5).
+- [x] El módulo de la velocidad de la bola se mantiene constante durante toda una partida.
+- [x] Cada nivel muestra su propio layout de bloques y las celdas `null` quedan sin bloque.
+- [x] Todos los bloques se rompen de un solo golpe en los 5 niveles.
+- [x] El `<select>` está deshabilitado mientras se está jugando (`phase === "playing"`).
+- [x] El `<select>` vuelve a estar habilitado en las pantallas de inicio, Game Over y Victoria.
+- [x] El HUD muestra el nivel en curso (`Nivel N`) y coincide con el nivel elegido.
+- [x] Al ganar (todos los bloques rotos) el juego vuelve al selector y permite elegir nivel antes de rejugar.
+- [x] Al perder (0 vidas) el juego vuelve al selector y permite elegir nivel antes de rejugar.
+- [x] Cambiar de nivel en el `<select>` y volver a empezar carga el nuevo layout y la nueva velocidad.
+- [x] El juego carga sin errores en consola.
 
 ---
 
