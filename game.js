@@ -8,7 +8,19 @@ const HEIGHT = canvas.height; // 600
 
 // --- Entidades ---
 
-const SPEED = 5; // módulo constante de la velocidad de la bola (px/frame)
+const SPEED = 5;                     // módulo constante de la velocidad de la bola (px/frame)
+const MAX_BOUNCE_ANGLE = Math.PI / 3; // ±60° respecto a la vertical en el rebote de la paleta
+
+// --- Sonidos ---
+
+const sndBounce = new Audio("assets/sounds/ball-bounce.mp3");
+const sndBreak = new Audio("assets/sounds/break-sound.mp3");
+
+// Reinicia y reproduce un sonido (permite disparos rápidos y solapados).
+function playSound(snd) {
+  snd.currentTime = 0;
+  snd.play().catch(() => {}); // ignora bloqueos de autoplay
+}
 
 // Estado global del juego
 const game = {
@@ -139,6 +151,49 @@ function updateBall() {
   }
   ball.x += ball.vx;
   ball.y += ball.vy;
+
+  // Rebote en paredes izquierda / derecha.
+  if (ball.x - ball.r < 0) {
+    ball.x = ball.r;
+    ball.vx = -ball.vx;
+    playSound(sndBounce);
+  } else if (ball.x + ball.r > WIDTH) {
+    ball.x = WIDTH - ball.r;
+    ball.vx = -ball.vx;
+    playSound(sndBounce);
+  }
+
+  // Rebote en pared superior.
+  if (ball.y - ball.r < 0) {
+    ball.y = ball.r;
+    ball.vy = -ball.vy;
+    playSound(sndBounce);
+  }
+
+  // Rebote en la paleta (sólo si la bola baja).
+  if (
+    ball.vy > 0 &&
+    ball.y + ball.r >= paddle.y &&
+    ball.y - ball.r <= paddle.y + paddle.h &&
+    ball.x + ball.r >= paddle.x &&
+    ball.x - ball.r <= paddle.x + paddle.w
+  ) {
+    bounceOffPaddle();
+  }
+}
+
+// Ángulo de salida según el punto de impacto en la paleta; velocidad de módulo SPEED.
+function bounceOffPaddle() {
+  const paddleCenter = paddle.x + paddle.w / 2;
+  let hit = (ball.x - paddleCenter) / (paddle.w / 2); // -1 (izq) .. +1 (dcha)
+  hit = Math.max(-1, Math.min(1, hit));
+
+  const angle = hit * MAX_BOUNCE_ANGLE; // respecto a la vertical
+  ball.vx = SPEED * Math.sin(angle);
+  ball.vy = -SPEED * Math.cos(angle);   // siempre hacia arriba
+
+  ball.y = paddle.y - ball.r;           // reposiciona encima de la paleta
+  playSound(sndBounce);
 }
 
 // --- Dibujo ---
