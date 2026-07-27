@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid
 
-> **Estado:** Aprobado
+> **Estado:** Implementado
 > **Depende de:** — (ninguno; primer spec)
 > **Fecha:** 2026-07-22
 > **Objetivo:** Entregar un Arkanoid de un nivel jugable de principio a fin, con paleta, bola, bloques que se rompen, vidas, puntuación y pantallas de inicio/victoria/derrota.
@@ -118,25 +118,25 @@ const explosions = [];
 
 ## Criterios de aceptación
 
-- [ ] El juego carga en el navegador sin errores en consola.
-- [ ] Al abrir se muestra la pantalla de inicio con el texto para empezar.
-- [ ] La paleta sigue el cursor del ratón y no se sale del canvas.
-- [ ] La paleta se mueve con las flechas ←/→ y no se sale del canvas.
-- [ ] La bola empieza pegada a la paleta y se lanza con click o barra espaciadora.
-- [ ] La bola rebota en las paredes izquierda, derecha y superior.
-- [ ] El ángulo de rebote en la paleta cambia según dónde golpea la bola.
-- [ ] La velocidad (módulo) de la bola se mantiene constante durante la partida.
-- [ ] Al inicio se muestran los bloques del nivel según `LEVEL`.
-- [ ] Romper un bloque lo elimina de la pantalla.
-- [ ] Romper un bloque suma exactamente 10 puntos.
-- [ ] Al romper un bloque se reproduce `break-sound.mp3`.
-- [ ] Al rebotar en paleta o paredes se reproduce `ball-bounce.mp3`.
-- [ ] Al romper un bloque aparece su animación de explosión y luego desaparece.
-- [ ] El HUD muestra la puntuación y las vidas restantes actualizadas.
-- [ ] Perder la bola por abajo resta una vida y la bola vuelve a estado de saque.
-- [ ] Al llegar a 0 vidas se muestra la pantalla de Game Over.
-- [ ] Al romper todos los bloques se muestra la pantalla de Victoria.
-- [ ] Desde Game Over y Victoria se puede reiniciar y jugar de nuevo con el estado reseteado.
+- [x] El juego carga en el navegador sin errores en consola.
+- [x] Al abrir se muestra la pantalla de inicio con el texto para empezar.
+- [x] La paleta sigue el cursor del ratón y no se sale del canvas.
+- [x] La paleta se mueve con las flechas ←/→ y no se sale del canvas.
+- [x] La bola empieza pegada a la paleta y se lanza con click o barra espaciadora.
+- [x] La bola rebota en las paredes izquierda, derecha y superior.
+- [x] El ángulo de rebote en la paleta cambia según dónde golpea la bola.
+- [x] La velocidad (módulo) de la bola se mantiene constante durante la partida.
+- [x] Al inicio se muestran los bloques del nivel según `LEVEL`.
+- [x] Romper un bloque lo elimina de la pantalla.
+- [x] Romper un bloque suma exactamente 10 puntos.
+- [x] Al romper un bloque se reproduce `break-sound.mp3`.
+- [x] Al rebotar en paleta o paredes se reproduce `ball-bounce.mp3`.
+- [x] Al romper un bloque aparece su animación de explosión y luego desaparece.
+- [x] El HUD muestra la puntuación y las vidas restantes actualizadas.
+- [x] Perder la bola por abajo resta una vida y la bola vuelve a estado de saque.
+- [x] Al llegar a 0 vidas se muestra la pantalla de Game Over.
+- [x] Al romper todos los bloques se muestra la pantalla de Victoria.
+- [x] Desde Game Over y Victoria se puede reiniciar y jugar de nuevo con el estado reseteado.
 
 ---
 
