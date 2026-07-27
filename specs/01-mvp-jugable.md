@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid
 
-> **Estado:** Borrador
+> **Estado:** Aprobado
 > **Depende de:** — (ninguno; primer spec)
 > **Fecha:** 2026-07-22
 > **Objetivo:** Entregar un Arkanoid de un nivel jugable de principio a fin, con paleta, bola, bloques que se rompen, vidas, puntuación y pantallas de inicio/victoria/derrota.
