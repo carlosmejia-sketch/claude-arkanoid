@@ -329,16 +329,21 @@ function drawBall() {
   drawSprite(ctx, "ball", ball.x - ball.r, ball.y - ball.r, ball.r * 2, ball.r * 2);
 }
 
+const LIFE_ICON = 20;  // tamaño del sprite de vida (px)
+const LIFE_GAP = 6;    // separación entre iconos (px)
+
 function drawHUD() {
   ctx.fillStyle = "#fff";
   ctx.font = "20px Arial, sans-serif";
   ctx.textBaseline = "top";
-
   ctx.textAlign = "left";
   ctx.fillText("Puntos: " + game.score, 12, 12);
 
-  ctx.textAlign = "right";
-  ctx.fillText("Vidas: " + game.lives, WIDTH - 12, 12);
+  // Vidas: un sprite de la bola por cada vida restante, alineadas a la derecha.
+  for (let i = 0; i < game.lives; i++) {
+    const x = WIDTH - 12 - (i + 1) * LIFE_ICON - i * LIFE_GAP;
+    drawSprite(ctx, "ball", x, 12, LIFE_ICON, LIFE_ICON);
+  }
 }
 
 // Superposición con título y subtítulo centrados sobre un velo oscuro.
