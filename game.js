@@ -225,7 +225,9 @@ function checkWin() {
 }
 
 // La paleta sigue el cursor: centrada en el ratón, ajustando por el escalado del canvas.
+// Solo durante la partida; en start/gameover/win el ratón no mueve la barra (igual que el teclado).
 canvas.addEventListener("mousemove", (e) => {
+  if (game.phase !== "playing") return;
   const rect = canvas.getBoundingClientRect();
   const mouseX = (e.clientX - rect.left) * (WIDTH / rect.width);
   paddle.x = mouseX - paddle.w / 2;
