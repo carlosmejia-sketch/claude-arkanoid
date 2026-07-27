@@ -107,18 +107,29 @@ document.addEventListener("keyup", (e) => {
   if (e.key === "ArrowRight") keys.right = false;
 });
 
-// Saque con barra espaciadora.
+// Acción principal (barra espaciadora).
 document.addEventListener("keydown", (e) => {
   if (e.key === " " || e.code === "Space") {
     e.preventDefault();
-    launchBall();
+    handleAction();
   }
 });
 
-// Saque con click.
+// Acción principal (click).
 canvas.addEventListener("mousedown", () => {
-  launchBall();
+  handleAction();
 });
+
+// Interpreta la acción (click/espacio) según la fase del juego.
+function handleAction() {
+  if (game.phase === "start") {
+    game.phase = "playing";
+  } else if (game.phase === "playing") {
+    launchBall();
+  } else if (game.phase === "gameover" || game.phase === "win") {
+    resetGame();
+  }
+}
 
 // Lanza la bola si está pegada a la paleta (módulo de velocidad = SPEED).
 function launchBall() {
@@ -126,6 +137,26 @@ function launchBall() {
   game.ballLaunched = true;
   ball.vx = 0;
   ball.vy = -SPEED;
+}
+
+// Reinicia el estado completo y deja una partida lista para jugar.
+function resetGame() {
+  game.score = 0;
+  game.lives = 3;
+  game.ballLaunched = false;
+  game.phase = "playing";
+  ball.vx = 0;
+  ball.vy = 0;
+  paddle.x = 350;
+  bricks = buildBricks();
+  explosions.length = 0;
+}
+
+// Victoria cuando no queda ningún bloque vivo.
+function checkWin() {
+  if (bricks.every((b) => !b.alive)) {
+    game.phase = "win";
+  }
 }
 
 // La paleta sigue el cursor: centrada en el ratón, ajustando por el escalado del canvas.
@@ -310,13 +341,44 @@ function drawHUD() {
   ctx.fillText("Vidas: " + game.lives, WIDTH - 12, 12);
 }
 
+// Superposición con título y subtítulo centrados sobre un velo oscuro.
+function drawOverlay(title, subtitle) {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.font = "48px Arial, sans-serif";
+  ctx.fillText(title, WIDTH / 2, HEIGHT / 2 - 30);
+
+  ctx.font = "22px Arial, sans-serif";
+  ctx.fillText(subtitle, WIDTH / 2, HEIGHT / 2 + 30);
+}
+
+function drawStartScreen() {
+  drawOverlay("ARKANOID", "Pulsa click o espacio para jugar");
+}
+
+function drawGameOverScreen() {
+  drawOverlay("GAME OVER", "Pulsa click o espacio para reiniciar");
+}
+
+function drawWinScreen() {
+  drawOverlay("¡VICTORIA!", "Pulsa click o espacio para jugar de nuevo");
+}
+
 // Bucle principal: limpia el canvas y dibuja la escena cada frame.
 function loop(timestamp) {
   now = timestamp;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-  updatePaddle();
-  updateBall();
+  if (game.phase === "playing") {
+    updatePaddle();
+    updateBall();
+    checkWin();
+  }
   updateExplosions();
 
   drawBricks();
@@ -324,6 +386,10 @@ function loop(timestamp) {
   drawPaddle();
   drawBall();
   drawHUD();
+
+  if (game.phase === "start") drawStartScreen();
+  else if (game.phase === "gameover") drawGameOverScreen();
+  else if (game.phase === "win") drawWinScreen();
 
   requestAnimationFrame(loop);
 }
