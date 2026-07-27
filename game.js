@@ -8,7 +8,9 @@ const HEIGHT = canvas.height; // 600
 
 // --- Entidades ---
 
-const SPEED = 5;                     // módulo constante de la velocidad de la bola (px/frame)
+// Módulo de la velocidad de la bola (px/frame). Variable: se fija al empezar
+// cada partida según el nivel elegido (speed = 3 + nivel).
+let SPEED = 5;
 const MAX_BOUNCE_ANGLE = Math.PI / 3; // ±60° respecto a la vertical en el rebote de la paleta
 
 // --- Sonidos ---
@@ -28,6 +30,7 @@ const game = {
   score: 0,
   lives: 3,
   ballLaunched: false,  // false = pegada a la paleta esperando saque
+  level: 1,             // nivel en curso (1..5)
 };
 
 // Paleta (esquina superior izquierda)
@@ -48,12 +51,61 @@ const ball = {
 
 const POINTS_PER_BRICK = 10;
 
-// Layout del nivel: cada fila es un color de sprite.
-const LEVEL = [
-  ["red", "red", "red", "red", "red", "red", "red", "red"],
-  ["yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow"],
-  ["cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan", "cyan"],
-  ["green", "green", "green", "green", "green", "green", "green", "green"],
+// Los 5 niveles. speed = 3 + nº de nivel (4,5,6,7,8 px/frame).
+// layout: filas de 8 columnas; cada celda es un color de sprite o null (hueco).
+const LEVELS = [
+  // Nivel 1 — filas llenas (clásico)
+  {
+    speed: 4,
+    layout: [
+      ["red",    "red",    "red",    "red",    "red",    "red",    "red",    "red"],
+      ["yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow", "yellow"],
+      ["cyan",   "cyan",   "cyan",   "cyan",   "cyan",   "cyan",   "cyan",   "cyan"],
+      ["green",  "green",  "green",  "green",  "green",  "green",  "green",  "green"],
+    ],
+  },
+  // Nivel 2 — tablero de ajedrez (colores alternos, huecos alternos)
+  {
+    speed: 5,
+    layout: [
+      ["magenta", null, "magenta", null, "magenta", null, "magenta", null],
+      [null, "cyan", null, "cyan", null, "cyan", null, "cyan"],
+      ["magenta", null, "magenta", null, "magenta", null, "magenta", null],
+      [null, "cyan", null, "cyan", null, "cyan", null, "cyan"],
+    ],
+  },
+  // Nivel 3 — pirámide centrada
+  {
+    speed: 6,
+    layout: [
+      [null,     null,     null,   "red",    "red",   null,     null,     null],
+      [null,     null,   "yellow", "yellow", "yellow","yellow", null,     null],
+      [null,   "hotpink","hotpink","hotpink","hotpink","hotpink","hotpink", null],
+      ["green", "green", "green", "green", "green", "green", "green", "green"],
+    ],
+  },
+  // Nivel 4 — franjas verticales (columnas alternas)
+  {
+    speed: 7,
+    layout: [
+      ["red", null, "cyan", null, "yellow", null, "hotpink", null],
+      ["red", null, "cyan", null, "yellow", null, "hotpink", null],
+      ["red", null, "cyan", null, "yellow", null, "hotpink", null],
+      ["red", null, "cyan", null, "yellow", null, "hotpink", null],
+      ["red", null, "cyan", null, "yellow", null, "hotpink", null],
+    ],
+  },
+  // Nivel 5 — marco hueco (borde de bloques, centro vacío)
+  {
+    speed: 8,
+    layout: [
+      ["gray", "gray",   "gray",   "gray",   "gray",   "gray",   "gray",   "gray"],
+      ["gray",  null,     null,     null,     null,     null,     null,    "gray"],
+      ["gray",  null,   "red",    "red",    "red",    "red",     null,    "gray"],
+      ["gray",  null,     null,     null,     null,     null,     null,    "gray"],
+      ["gray", "gray",   "gray",   "gray",   "gray",   "gray",   "gray",   "gray"],
+    ],
+  },
 ];
 
 // Márgenes fijos de la rejilla (px)
@@ -63,20 +115,23 @@ const BRICK_GAP = 4;      // hueco entre bloques
 const BRICK_H = 24;       // alto de cada bloque
 
 // Ancho de bloque derivado del nº de columnas y los márgenes.
-const COLS = LEVEL[0].length;
+// Todas las rejillas tienen 8 columnas → BRICK_W constante entre niveles.
+const COLS = 8;
 const BRICK_W = (WIDTH - GRID_SIDE * 2 - BRICK_GAP * (COLS - 1)) / COLS;
 
-// Genera el array plano de bloques a partir de LEVEL.
-function buildBricks() {
+// Genera el array plano de bloques a partir de un layout de nivel.
+function buildBricks(layout) {
   const list = [];
-  for (let row = 0; row < LEVEL.length; row++) {
-    for (let col = 0; col < LEVEL[row].length; col++) {
+  for (let row = 0; row < layout.length; row++) {
+    for (let col = 0; col < layout[row].length; col++) {
+      const color = layout[row][col];
+      if (color === null) continue; // celda vacía: sin bloque
       list.push({
         x: GRID_SIDE + col * (BRICK_W + BRICK_GAP),
         y: GRID_TOP + row * (BRICK_H + BRICK_GAP),
         w: BRICK_W,
         h: BRICK_H,
-        color: LEVEL[row][col],
+        color: color,
         alive: true,
       });
     }
@@ -84,7 +139,7 @@ function buildBricks() {
   return list;
 }
 
-let bricks = buildBricks();
+let bricks = buildBricks(LEVELS[game.level - 1].layout);
 
 // Explosiones activas (animación temporal al romper un bloque).
 // { x, y, w, h, color, startedAt }
