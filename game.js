@@ -86,6 +86,13 @@ function buildBricks() {
 
 let bricks = buildBricks();
 
+// Explosiones activas (animación temporal al romper un bloque).
+// { x, y, w, h, color, startedAt }
+const explosions = [];
+
+// Marca de tiempo del frame actual (ms), fijada por requestAnimationFrame.
+let now = 0;
+
 // --- Entrada ---
 
 const keys = { left: false, right: false };
@@ -170,6 +177,8 @@ function updateBall() {
     playSound(sndBounce);
   }
 
+  collideBricks();
+
   // Rebote en la paleta (sólo si la bola baja).
   if (
     ball.vy > 0 &&
@@ -179,6 +188,43 @@ function updateBall() {
     ball.x - ball.r <= paddle.x + paddle.w
   ) {
     bounceOffPaddle();
+  }
+}
+
+// Colisión bola-bloque: rompe el primer bloque golpeado en el frame.
+function collideBricks() {
+  for (const b of bricks) {
+    if (!b.alive) continue;
+
+    // AABB bola (bounding box) vs bloque.
+    if (
+      ball.x + ball.r < b.x ||
+      ball.x - ball.r > b.x + b.w ||
+      ball.y + ball.r < b.y ||
+      ball.y - ball.r > b.y + b.h
+    ) {
+      continue;
+    }
+
+    // Eje de rebote: el de menor penetración.
+    const overlapLeft = ball.x + ball.r - b.x;
+    const overlapRight = b.x + b.w - (ball.x - ball.r);
+    const overlapTop = ball.y + ball.r - b.y;
+    const overlapBottom = b.y + b.h - (ball.y - ball.r);
+    const minX = Math.min(overlapLeft, overlapRight);
+    const minY = Math.min(overlapTop, overlapBottom);
+
+    if (minX < minY) {
+      ball.vx = -ball.vx;
+    } else {
+      ball.vy = -ball.vy;
+    }
+
+    b.alive = false;
+    game.score += POINTS_PER_BRICK;
+    explosions.push({ x: b.x, y: b.y, w: b.w, h: b.h, color: b.color, startedAt: now });
+    playSound(sndBreak);
+    break; // un solo bloque por frame
   }
 }
 
@@ -198,6 +244,27 @@ function bounceOffPaddle() {
 
 // --- Dibujo ---
 
+// Elimina explosiones cuyo tiempo de vida ha terminado.
+function updateExplosions() {
+  for (let i = explosions.length - 1; i >= 0; i--) {
+    if (now - explosions[i].startedAt >= EXPLOSION_DURATION) {
+      explosions.splice(i, 1);
+    }
+  }
+}
+
+function drawExplosions() {
+  const frameCount = 4; // 4 frames por color
+  const frameMs = EXPLOSION_DURATION / frameCount;
+  for (const ex of explosions) {
+    const elapsed = now - ex.startedAt;
+    let idx = Math.floor(elapsed / frameMs);
+    if (idx >= frameCount) idx = frameCount - 1;
+    const frame = EXPLOSION_FRAMES[ex.color][idx];
+    drawFrame(ctx, frame, ex.x, ex.y, ex.w, ex.h);
+  }
+}
+
 function drawBricks() {
   for (const b of bricks) {
     if (!b.alive) continue;
@@ -214,13 +281,16 @@ function drawBall() {
 }
 
 // Bucle principal: limpia el canvas y dibuja la escena cada frame.
-function loop() {
+function loop(timestamp) {
+  now = timestamp;
   ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
   updatePaddle();
   updateBall();
+  updateExplosions();
 
   drawBricks();
+  drawExplosions();
   drawPaddle();
   drawBall();
 
