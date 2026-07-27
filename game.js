@@ -404,6 +404,11 @@ function drawHUD() {
   ctx.textAlign = "left";
   ctx.fillText("Puntos: " + game.score, 12, 12);
 
+  // Nivel en curso, centrado en la parte superior.
+  ctx.textAlign = "center";
+  ctx.fillText("Nivel " + game.level, WIDTH / 2, 12);
+  ctx.textAlign = "left";
+
   // Vidas: un sprite de la bola por cada vida restante, alineadas a la derecha.
   for (let i = 0; i < game.lives; i++) {
     const x = WIDTH - 12 - (i + 1) * LIFE_ICON - i * LIFE_GAP;
